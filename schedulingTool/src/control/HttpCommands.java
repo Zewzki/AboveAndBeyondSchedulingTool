@@ -1,8 +1,13 @@
 package control;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -10,9 +15,10 @@ import java.net.http.HttpResponse;
 
 public class HttpCommands {
 
-    private static final String geocodeURL = "https://open.mapquestapi.com/geocoding/v1/address?";
-    private static final String staticMapURL = "https://wwww.mapquestapi.com/staticmap/V5/map?";
+    private static final String geocodeURL = "https://www.mapquestapi.com/geocoding/v1/address?";
+    private static final String staticMapURL = "https://www.mapquestapi.com/staticmap/v5/map?";
     private static final String apiKey = "GdCAz5hjHAlQN3lb9PFUabP0ElcW7BsF";
+    private static final String defaultMap = staticMapURL + "key=" + apiKey + "&center=Minneapolis,MN";
 
     public static void request(String url) {
 
@@ -79,31 +85,36 @@ public class HttpCommands {
 
     }
 
-    public static void getStaticMap(String center, String zoom, String size, String boundingBox, String margin) {
+    public static BufferedImage getStaticMap(String center, String zoom, String size, String boundingBox, String margin) {
 
         String url = staticMapURL;
         url += "key=" + apiKey;
         //url += "&center=" + center;
         //url += "&zoom=" + zoom;
-        //url += "&size=" + size;
+        url += "&size=" + size;
         url += "&boundingBox=" + boundingBox;
         url += "&margin=" + margin;
 
+        System.out.println(url);
+
         try {
 
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+            BufferedImage staticMap = ImageIO.read(new URL(url));
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return staticMap;
 
-            System.out.println(response.body());
-
-        } catch (ConnectException e) {
-            e.printStackTrace();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.err.println("Unable to process request: " + url);
             e.printStackTrace();
         }
+
+        try {
+            return ImageIO.read(new URL(defaultMap));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
 
     }
 
