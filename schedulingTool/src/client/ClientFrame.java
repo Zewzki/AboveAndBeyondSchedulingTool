@@ -66,7 +66,13 @@ public class ClientFrame extends JFrame {
         public void mouseDragged(MouseEvent e) {}
 
         @Override
-        public void mouseMoved(MouseEvent e) {}
+        public void mouseMoved(MouseEvent e) {
+
+            int x = e.getX();
+            int y = e.getY() - 28;
+            panel.setMousePosition(x, y);
+
+        }
 
     }
 

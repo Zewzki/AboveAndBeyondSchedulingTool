@@ -39,7 +39,7 @@ public class HttpCommands {
 
     public static float[] getCoordinates(String address, String city, String state, String zip) {
 
-        String location = "&location=" + address.replace(" ", "%20") + "," + city + "," + state + "," + zip;
+        String location = "&location=" + address.replace(" ", "%20") + "," + city.replace(" ", "%20") + "," + state + "," + zip;
         String url = geocodeURL + "key=" + apiKey + location;
 
         //System.out.println(url);
