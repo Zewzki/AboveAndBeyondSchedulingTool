@@ -17,8 +17,14 @@ public class ClientPanel extends JPanel {
 
     private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
 
+    private static final int displayOffsetX = -10;
+    private static final int displayOffsetY = -40;
+
     private static final Color clientColor = Color.RED;
     private static final Color therapistColor = new Color(0, 173, 0);
+    private static final Color textColor = new Color(0, 0, 0);
+    private static final Color textBackgroundColor = new Color(232, 223, 180);
+    private static final int textBoxHeight = 20;
     private static final int pointSize = 10;
     private static final int displayDistance = 10;
     private static final int nameFontSize = 24;
@@ -57,7 +63,8 @@ public class ClientPanel extends JPanel {
 
         //assignmentData = loadData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\assignmentList.csv");
 
-        boundingBox = new float[] {90.0f, -180.0f, -90.0f, 180.0f};
+        //[maxLat, minLng, minLat, maxLng]
+        boundingBox = new float[] {-90.0f, 180.0f, 90.0f, -180.0f};
         center = new float[] {39, -100};
         zoom = 14;
         size = new int[] {w, h};
@@ -70,7 +77,7 @@ public class ClientPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawImage(map, mapOffsetX, mapOffsetY, size[0], size[1], null);
+        g.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX, size[1] + mapOffsetY, null);
 
         int bestIndex = -1;
         float minDistance = Float.MAX_VALUE;
@@ -83,10 +90,13 @@ public class ClientPanel extends JPanel {
             float lat = curr.getLatitude();
             float lng = curr.getLongitude();
 
-            // (w - 0) / (x - 0) = (maxLat - minLat) / (lat - minLat)
+            //[maxLat, minLng, minLat, maxLng]
 
-            int mapX = (int) (size[0] / ((boundingBox[2] - boundingBox[0]) / (lat - boundingBox[0])));
-            int mapY = (int) (size[1] / ((boundingBox[3] - boundingBox[1]) / (lng - boundingBox[1])));
+            // (w - 0) / (x - 0) = (maxLat - minLat) / (lat - minLat)
+            // as lat ^, moves north
+            // as lng ^, moves east
+            int mapY = (int) ((lat - boundingBox[0]) / (boundingBox[2] - boundingBox[0]) * size[1]);
+            int mapX = (int) ((lng - boundingBox[1]) / (boundingBox[3] - boundingBox[1]) * size[0]);
 
             float distanceFromMouse = (float) Math.sqrt(Math.pow(mapX - mouseX, 2) + Math.pow(mapY - mouseY, 2));
             if(distanceFromMouse < minDistance) {
@@ -117,18 +127,18 @@ public class ClientPanel extends JPanel {
         if(minDistance <= displayDistance) {
 
             String name = allData.get(bestIndex).getFirstName() + " " + allData.get(bestIndex).getLastName();
-            g.setColor(Color.BLACK);
+            g.setColor(textColor);
             g.setFont(nameFont);
 
             int xOffs = 0;
             int yOffs = 0;
 
             if(quadrant == 1) {
-                yOffs = 0;
+                yOffs = 20;
                 xOffs = -1 * (name.length() * 10);
             }
             else if(quadrant == 2) {
-                yOffs = 0;
+                yOffs = 20;
                 xOffs = 10;
             }
             else if(quadrant == 3) {
@@ -140,12 +150,19 @@ public class ClientPanel extends JPanel {
                 xOffs = -1 * (name.length() * 10);
             }
 
+            g.setColor(textBackgroundColor);
+            g.fillRect(bestPos[0] + xOffs, bestPos[1] + yOffs - textBoxHeight, name.length() * 10, textBoxHeight);
+
+            g.setColor(textColor);
+            g.drawRect(bestPos[0] + xOffs, bestPos[1] + yOffs - textBoxHeight, name.length() * 10, textBoxHeight);
             g.drawString(name, bestPos[0] + xOffs, bestPos[1] + yOffs);
+
 
         }
 
     }
 
+    //[maxLat, minLng, minLat, maxLng]
     private void findBoundingBox() {
 
         float avgLat = 0.0f;
@@ -159,10 +176,10 @@ public class ClientPanel extends JPanel {
             avgLat += lat;
             avgLng += lng;
 
-            if(lat < boundingBox[0]) boundingBox[0] = lat;
-            if(lat > boundingBox[2]) boundingBox[2] = lat;
-            if(lng > boundingBox[1]) boundingBox[1] = lng;
-            if(lng < boundingBox[3]) boundingBox[3] = lng;
+            if(lng < boundingBox[1]) boundingBox[1] = lng;
+            if(lng > boundingBox[3]) boundingBox[3] = lng;
+            if(lat < boundingBox[2]) boundingBox[2] = lat;
+            if(lat > boundingBox[0]) boundingBox[0] = lat;
 
         }
 
@@ -212,7 +229,7 @@ public class ClientPanel extends JPanel {
 
         ArrayList<PersonalData> formattedData = new ArrayList<PersonalData>();
 
-        for(int i = 0; i < 1 /*rawData.size()*/; i++) {
+        for(int i = 0; i < rawData.size(); i++) {
 
             CSVRecord c = rawData.get(i);
 
@@ -245,6 +262,11 @@ public class ClientPanel extends JPanel {
         mouseY = y;
         repaint();
 
+    }
+
+    public void setSize(int x, int y) {
+        size[0] = x;
+        size[1] = y;
     }
 
 }

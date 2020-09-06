@@ -39,10 +39,12 @@ public class HttpCommands {
 
     public static float[] getCoordinates(String address, String city, String state, String zip) {
 
+        if(address.contains(" #")) address = address.split(" #")[0];
+
         String location = "&location=" + address.replace(" ", "%20") + "," + city.replace(" ", "%20") + "," + state + "," + zip;
         String url = geocodeURL + "key=" + apiKey + location;
 
-        //System.out.println(url);
+        System.out.println(url);
 
         try {
 
@@ -52,8 +54,8 @@ public class HttpCommands {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             //System.out.println(response.body());
 
-            int latStartIndex = response.body().lastIndexOf("\"lat\":") + 6;
-            int lngStartIndex = response.body().lastIndexOf("\"lng\":") + 6;
+            int latStartIndex = response.body().indexOf("\"lat\":") + 6;
+            int lngStartIndex = response.body().indexOf("\"lng\":") + 6;
 
             int latEndIndex = latStartIndex;
             char currChar = response.body().charAt(latEndIndex);

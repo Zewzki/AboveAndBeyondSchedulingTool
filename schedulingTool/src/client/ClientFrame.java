@@ -68,8 +68,8 @@ public class ClientFrame extends JFrame {
         @Override
         public void mouseMoved(MouseEvent e) {
 
-            int x = e.getX();
-            int y = e.getY() - 28;
+            int x = e.getX() - 10;
+            int y = e.getY() - 40;
             panel.setMousePosition(x, y);
 
         }
@@ -79,7 +79,12 @@ public class ClientFrame extends JFrame {
     private class ResizeHandler implements ComponentListener {
 
         @Override
-        public void componentResized(ComponentEvent e) {}
+        public void componentResized(ComponentEvent e) {
+
+            panel.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+            panel.repaint();
+
+        }
 
         @Override
         public void componentMoved(ComponentEvent e) {}
