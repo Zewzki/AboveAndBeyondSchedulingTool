@@ -5,13 +5,16 @@ import java.awt.event.*;
 
 public class ClientFrame extends JFrame {
 
-    private static final int STARTING_DIM = 600;
+    private static final int STARTING_WIDTH = 900;
+    private static final int STARTING_HEIGHT = 900;
+
+    //private static final int STARTING_DIM = 800;
 
     private ClientPanel panel;
 
     public ClientFrame() {
 
-        setSize(STARTING_DIM, STARTING_DIM);
+        setSize(STARTING_WIDTH, STARTING_HEIGHT);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(true);
         setLocationRelativeTo(null);
@@ -19,8 +22,9 @@ public class ClientFrame extends JFrame {
         addMouseListener(new MouseHandler());
         addKeyListener(new KeyHandler());
         addMouseMotionListener(new MouseMotionHandler());
+        addComponentListener(new ResizeHandler());
 
-        panel = new ClientPanel(STARTING_DIM, STARTING_DIM);
+        panel = new ClientPanel(STARTING_WIDTH, STARTING_HEIGHT);
         add(panel);
 
         setVisible(true);
