@@ -41,6 +41,10 @@ public class ClientPanel extends JPanel {
     private static final Color assignmentColor = new Color(6, 137, 198);
     private static final Color textColor = new Color(0, 0, 0);
     private static final Color textBackgroundColor = new Color(232, 223, 180);
+
+    private static final BasicStroke thinStroke = new BasicStroke(1);
+    private static final BasicStroke thickStroke = new BasicStroke(3);
+
     private static final int textBoxHeight = 20;
     private static final int pointSize = 10;
     private static final int displayDistance = 10;
@@ -77,10 +81,13 @@ public class ClientPanel extends JPanel {
         //therapistData = selectFileAndLoad("therapist");
         //assignmentData = selectFileAndLoad("assignment");
 
-        clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
-        therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
+        //clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
+        //therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
+        clientData = DataLoader.loadClientData();
+        therapistData = DataLoader.loadTherapistData();
+        DataLoader.loadAssignments(clientData, therapistData);
 
-        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
+        //DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
 
         allData = new ArrayList<PersonalData>();
         allData.addAll(clientData);
@@ -121,8 +128,13 @@ public class ClientPanel extends JPanel {
 
                     g.setColor(assignmentColor);
 
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setStroke(thickStroke);
+
                     for(Client client : therapistClients)
-                        g.drawLine(curr.getTranslationX() + pointSize / 2, curr.getTranslationY() + pointSize / 2, client.getTranslationX() + pointSize / 2, client.getTranslationY() + pointSize / 2);
+                        g2.drawLine(curr.getTranslationX() + pointSize / 2, curr.getTranslationY() + pointSize / 2, client.getTranslationX() + pointSize / 2, client.getTranslationY() + pointSize / 2);
+
+                    g2.setStroke(thinStroke);
 
                 }
 
@@ -264,8 +276,8 @@ public class ClientPanel extends JPanel {
     }
 
     public void setSize(int x, int y) {
-        size[0] = x;
-        size[1] = y;
+        size[0] = x + displayOffsetX;
+        size[1] = y + displayOffsetY;
 
         PersonalData.setScreenDimensions(size[0], size[1]);
 

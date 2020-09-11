@@ -11,7 +11,7 @@ public class Therapist extends PersonalData {
     public Therapist(String firstName, String lastName, String address, String city, String state, String zip, float latitude, float longitude, PersonType type) {
         super(firstName, lastName, address, city, state, zip, latitude, longitude, type);
 
-        displayClients = true;
+        displayClients = false;
         clientList = new ArrayList<>();
 
     }
@@ -19,7 +19,7 @@ public class Therapist extends PersonalData {
     public Therapist(String firstName, String lastName, String address, String city, String state, String zip) {
         super(firstName, lastName, address, city, state, zip, PersonType.Therapist);
 
-        displayClients = true;
+        displayClients = false;
         clientList = new ArrayList<>();
 
     }

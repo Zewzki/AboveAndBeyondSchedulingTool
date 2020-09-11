@@ -146,11 +146,12 @@ public class DataLoader {
 
                 try {
 
-                    String[] splitNames = curr.get(j).split(" ", 1);
+                    String[] splitNames = curr.get(j).split(" ", 2);
                     splitNames[0] = splitNames[0].toLowerCase();
                     splitNames[1] = splitNames[1].toLowerCase();
 
                     therapistNames[adjustedIndex] = splitNames;
+
                 } catch (PatternSyntaxException | ArrayIndexOutOfBoundsException e) {
                     therapistNames[adjustedIndex] = new String[]{"", ""};
                 }
@@ -173,17 +174,17 @@ public class DataLoader {
 
             if(c == null) continue;
 
-            System.out.println("Client " + c.getFirstName() + " " + c.getLastName() + " has ");
-
             for(int j = 0; j < therapistNames.length; j++) {
-                for(Therapist therapist : therapists) {
 
-                    System.out.println(therapist.getFirstName().toLowerCase() + " " + therapist.getLastName().toLowerCase() + " == " + therapistNames[j][0] + " " + therapistNames[j][1]);
+                if(therapistNames[j][0].equals("") && therapistNames[j][1].equals("")) continue;
+
+                for(Therapist therapist : therapists) {
 
                     if(therapist.getFirstName().toLowerCase().equals(therapistNames[j][0]) && therapist.getLastName().toLowerCase().equals(therapistNames[j][1])) {
                         //System.out.println(therapist.getFirstName() + " " + c.getLastName());
                         t.add(therapist);
                     }
+
                 }
             }
 
