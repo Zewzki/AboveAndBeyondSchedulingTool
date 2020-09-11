@@ -1,8 +1,14 @@
-package control;
+package personalData;
+
+import client.ClientFrame;
+import control.HttpCommands;
 
 public class PersonalData {
 
     private static final float distanceCoefficient = .0001f;
+
+    private static int screenWidth = ClientFrame.STARTING_WIDTH;
+    private static int screenHeight = ClientFrame.STARTING_HEIGHT;
 
     public enum PersonType {Client, Therapist};
 
@@ -49,7 +55,7 @@ public class PersonalData {
 
     }
 
-    public void calculateTranslation(float minLat, float maxLat, float minLng, float maxLng, int screenWidth, int screenHeight) {
+    public void calculateTranslation(float minLat, float maxLat, float minLng, float maxLng) {
 
         //[maxLat, minLng, minLat, maxLng]
         // lat - bb[1] / bb[3] - bb[1] * screenWidth
@@ -90,6 +96,11 @@ public class PersonalData {
 
         return s;
 
+    }
+
+    public static void setScreenDimensions(int w, int h) {
+        screenWidth = w;
+        screenHeight = h;
     }
 
 }

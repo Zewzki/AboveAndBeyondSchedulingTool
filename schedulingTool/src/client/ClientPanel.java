@@ -1,14 +1,13 @@
 package client;
 
-import control.CSVReader;
 import control.HttpCommands;
-import control.PersonalData;
-import org.apache.commons.csv.CSVRecord;
+import personalData.Client;
+import personalData.DataLoader;
+import personalData.PersonalData;
+import personalData.Therapist;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.geom.QuadCurve2D;
 import java.awt.image.BufferedImage;
 
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ public class ClientPanel extends JPanel {
 
     }
 
-    private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
-
     private static final int displayOffsetX = -10;
     private static final int displayOffsetY = -40;
 
@@ -41,6 +38,7 @@ public class ClientPanel extends JPanel {
 
     private static final Color clientColor = Color.RED;
     private static final Color therapistColor = new Color(0, 173, 0);
+    private static final Color assignmentColor = new Color(6, 137, 198);
     private static final Color textColor = new Color(0, 0, 0);
     private static final Color textBackgroundColor = new Color(232, 223, 180);
     private static final int textBoxHeight = 20;
@@ -67,10 +65,9 @@ public class ClientPanel extends JPanel {
     private int closestPointIndex = -1;
     private Quadrant quadrant = Quadrant.ONE;
 
-    private List<PersonalData> clientData;
-    private List<PersonalData> therapistData;
+    private List<Client> clientData;
+    private List<Therapist> therapistData;
     private List<PersonalData> allData;
-    private List<PersonalData> assignmentData;
 
     public ClientPanel(int w, int h) {
 
@@ -80,13 +77,14 @@ public class ClientPanel extends JPanel {
         //therapistData = selectFileAndLoad("therapist");
         //assignmentData = selectFileAndLoad("assignment");
 
-        clientData = loadData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv", PersonalData.PersonType.Client);
-        therapistData = loadData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv", PersonalData.PersonType.Therapist);
+        clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
+        therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
+
+        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
+
         allData = new ArrayList<PersonalData>();
         allData.addAll(clientData);
         allData.addAll(therapistData);
-
-        //assignmentData = loadData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\assignmentList.csv");
 
         //[maxLat, minLng, minLat, maxLng]
         boundingBox = new float[] {-90.0f, 180.0f, 90.0f, -180.0f};
@@ -96,7 +94,7 @@ public class ClientPanel extends JPanel {
         minDistance = Float.MAX_VALUE;
 
         findBoundingBox();
-        printDataList(allData);
+        DataLoader.printDataList(allData);
         updateMap();
 
     }
@@ -113,6 +111,24 @@ public class ClientPanel extends JPanel {
             Color c = curr.getType() == PersonalData.PersonType.Client ? clientColor : therapistColor;
             g.setColor(c);
 
+            if(curr.getType() == PersonalData.PersonType.Therapist) {
+
+                Therapist t = (Therapist) curr;
+
+                if(t.getDisplayClients()) {
+
+                    List<Client> therapistClients = t.getClientList();
+
+                    g.setColor(assignmentColor);
+
+                    for(Client client : therapistClients)
+                        g.drawLine(curr.getTranslationX() + pointSize / 2, curr.getTranslationY() + pointSize / 2, client.getTranslationX() + pointSize / 2, client.getTranslationY() + pointSize / 2);
+
+                }
+
+            }
+
+            g.setColor(c);
             g.fillOval(curr.getTranslationX(), curr.getTranslationY(), pointSize, pointSize);
 
         }
@@ -175,7 +191,7 @@ public class ClientPanel extends JPanel {
 
         //[maxLat, minLng, minLat, maxLng]
         for(int i = 0; i < allData.size(); i++)
-            allData.get(i).calculateTranslation(boundingBox[2], boundingBox[0], boundingBox[1], boundingBox[3], size[0], size[1]);
+            allData.get(i).calculateTranslation(boundingBox[2], boundingBox[0], boundingBox[1], boundingBox[3]);
 
     }
 
@@ -217,60 +233,24 @@ public class ClientPanel extends JPanel {
 
         }
 
-        System.out.println(String.format("Mouse: (%d, %d) -> (%d, %d) = %f", mouseX, mouseY, allData.get(closestPointIndex).getTranslationX(), allData.get(closestPointIndex).getTranslationY(), minDistance));
+        //System.out.println(String.format("Mouse: (%d, %d) -> (%d, %d) = %f", mouseX, mouseY, allData.get(closestPointIndex).getTranslationX(), allData.get(closestPointIndex).getTranslationY(), minDistance));
 
     }
 
-    private List<PersonalData> selectFileAndLoad(String listName, PersonalData.PersonType type) {
+    public void processClick() {
 
-        JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(filter);
+        //System.out.println(String.format("Click @ (%d, %d)", mouseX, mouseY));
 
-        JOptionPane.showMessageDialog(null, "Select " + listName + " list (.csv)");
-        int returnVal = fc.showOpenDialog(null);
+        if(closestPointIndex < 0 || closestPointIndex > allData.size()) return;
 
-        if(returnVal == JFileChooser.CANCEL_OPTION) System.exit(0);
-
-        while(returnVal != JFileChooser.APPROVE_OPTION || !fc.getSelectedFile().exists()) {
-            JOptionPane.showMessageDialog(null, "Couldn't load data, please select another file or try again.");
-            returnVal = fc.showOpenDialog(null);
+        if(allData.get(closestPointIndex).getType() == PersonalData.PersonType.Therapist) {
+            Therapist t = (Therapist) allData.get(closestPointIndex);
+            t.toggleDisplayClients();
         }
 
-        return loadData(fc.getSelectedFile().getAbsolutePath(), type);
+        repaint();
 
     }
-
-    private List<PersonalData> loadData(String path, PersonalData.PersonType type) {
-
-        List<CSVRecord> rawData = CSVReader.readCSV(path);
-        CSVReader.pruneEmptyRecords(rawData);
-
-        ArrayList<PersonalData> formattedData = new ArrayList<PersonalData>();
-
-        for(int i = 0; i < 10 /*rawData.size()*/; i++) {
-
-            CSVRecord c = rawData.get(i);
-
-            String first = c.get(0);
-            String last = c.get(1);
-            String addr = c.get(2);
-            String city = c.get(4);
-            String state = c.get(5);
-            String zip = c.get(6);
-
-            PersonalData d = new PersonalData(first, last, addr, city, state, zip, type);
-
-            //System.out.println(d.toString());
-
-            formattedData.add(d);
-
-        }
-
-        return formattedData;
-
-    }
-
-    private void printDataList(List<PersonalData> data) { for(PersonalData d : data) System.out.println(d.toString()); }
 
     public void setMousePosition(int x, int y) {
 
@@ -286,6 +266,12 @@ public class ClientPanel extends JPanel {
     public void setSize(int x, int y) {
         size[0] = x;
         size[1] = y;
+
+        PersonalData.setScreenDimensions(size[0], size[1]);
+
+        for(PersonalData p : allData)
+            p.calculateTranslation(boundingBox[2], boundingBox[0], boundingBox[1], boundingBox[3]);
+
     }
 
 }

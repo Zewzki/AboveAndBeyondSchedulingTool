@@ -5,8 +5,8 @@ import java.awt.event.*;
 
 public class ClientFrame extends JFrame {
 
-    private static final int STARTING_WIDTH = 900;
-    private static final int STARTING_HEIGHT = 900;
+    public static final int STARTING_WIDTH = 900;
+    public static final int STARTING_HEIGHT = 900;
 
     //private static final int STARTING_DIM = 800;
 
@@ -37,7 +37,11 @@ public class ClientFrame extends JFrame {
         public void mouseClicked(MouseEvent e) {}
 
         @Override
-        public void mousePressed(MouseEvent e) {}
+        public void mousePressed(MouseEvent e) {
+
+            panel.processClick();
+
+        }
 
         @Override
         public void mouseReleased(MouseEvent e) {}
