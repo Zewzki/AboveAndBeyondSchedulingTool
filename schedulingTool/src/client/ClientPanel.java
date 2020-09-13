@@ -31,14 +31,16 @@ public class ClientPanel extends JPanel {
 
     }
 
-    private static final int displayOffsetX = -10;
-    private static final int displayOffsetY = -40;
+    private static final Color[] edgeColors = new Color[] {Color.BLACK, new Color(6, 137, 198), Color.GREEN, Color.CYAN, Color.MAGENTA, Color.LIGHT_GRAY, Color.ORANGE, Color.PINK, Color.YELLOW};
+
+    private static final int displayOffsetX = -30;
+    private static final int displayOffsetY = -50;
 
     private static final float distanceFromCenterCoefficient = 200.0f;
+    private static final float newMapResizeThreshold = 100.0f;
 
     private static final Color clientColor = Color.RED;
     private static final Color therapistColor = new Color(0, 173, 0);
-    private static final Color assignmentColor = new Color(6, 137, 198);
     private static final Color textColor = new Color(0, 0, 0);
     private static final Color textBackgroundColor = new Color(232, 223, 180);
 
@@ -54,6 +56,9 @@ public class ClientPanel extends JPanel {
     private BufferedImage map;
     private int mapOffsetX;
     private int mapOffsetY;
+
+    private int lastResizeX;
+    private int lastResizeY;
 
     private int mouseX;
     private int mouseY;
@@ -81,13 +86,13 @@ public class ClientPanel extends JPanel {
         //therapistData = selectFileAndLoad("therapist");
         //assignmentData = selectFileAndLoad("assignment");
 
-        //clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
-        //therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
-        clientData = DataLoader.loadClientData();
-        therapistData = DataLoader.loadTherapistData();
-        DataLoader.loadAssignments(clientData, therapistData);
+        clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
+        therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
+        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
 
-        //DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
+        //clientData = DataLoader.loadClientData();
+        //therapistData = DataLoader.loadTherapistData();
+        //DataLoader.loadAssignments(clientData, therapistData);
 
         allData = new ArrayList<PersonalData>();
         allData.addAll(clientData);
@@ -100,6 +105,9 @@ public class ClientPanel extends JPanel {
         size = new int[] {w, h};
         minDistance = Float.MAX_VALUE;
 
+        lastResizeX = size[0];
+        lastResizeY = size[1];
+
         findBoundingBox();
         DataLoader.printDataList(allData);
         updateMap();
@@ -110,6 +118,8 @@ public class ClientPanel extends JPanel {
         super.paintComponent(g);
 
         g.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX, size[1] + mapOffsetY, null);
+
+        int assignmentColorIndex = 0;
 
         for(int i = 0; i < allData.size(); i++) {
 
@@ -126,7 +136,7 @@ public class ClientPanel extends JPanel {
 
                     List<Client> therapistClients = t.getClientList();
 
-                    g.setColor(assignmentColor);
+                    g.setColor(edgeColors[assignmentColorIndex]);
 
                     Graphics2D g2 = (Graphics2D) g;
                     g2.setStroke(thickStroke);
@@ -135,6 +145,8 @@ public class ClientPanel extends JPanel {
                         g2.drawLine(curr.getTranslationX() + pointSize / 2, curr.getTranslationY() + pointSize / 2, client.getTranslationX() + pointSize / 2, client.getTranslationY() + pointSize / 2);
 
                     g2.setStroke(thinStroke);
+
+                    assignmentColorIndex = (assignmentColorIndex + 1) % edgeColors.length;
 
                 }
 
@@ -283,6 +295,14 @@ public class ClientPanel extends JPanel {
 
         for(PersonalData p : allData)
             p.calculateTranslation(boundingBox[2], boundingBox[0], boundingBox[1], boundingBox[3]);
+
+        float resizeDist = (float) Math.sqrt(Math.pow(size[0] - lastResizeX, 2) + Math.pow(size[1] - lastResizeY, 2));
+
+        if(resizeDist > newMapResizeThreshold) {
+            updateMap();
+            lastResizeX = size[0];
+            lastResizeY = size[1];
+        }
 
     }
 
