@@ -5,7 +5,7 @@ import control.HttpCommands;
 
 public class PersonalData {
 
-    private static final float distanceCoefficient = .0001f;
+    private static final float distanceCoefficient = 5.0f;
 
     private static int screenWidth = ClientFrame.STARTING_WIDTH;
     private static int screenHeight = ClientFrame.STARTING_HEIGHT;
@@ -65,8 +65,6 @@ public class PersonalData {
 
         int distX = translationX - (screenWidth / 2);
         int distY = translationY - (screenHeight / 2);
-
-        double distFromCenter = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
 
     }
 

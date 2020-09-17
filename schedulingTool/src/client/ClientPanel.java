@@ -36,7 +36,9 @@ public class ClientPanel extends JPanel {
     private static final int displayOffsetX = -30;
     private static final int displayOffsetY = -50;
 
-    private static final float distanceFromCenterCoefficient = 200.0f;
+    private static final float longitudeOffset = 0.1f;
+    private static final float latitudeOffset = 0.1f;
+
     private static final float newMapResizeThreshold = 100.0f;
 
     private static final Color clientColor = Color.RED;
@@ -88,7 +90,7 @@ public class ClientPanel extends JPanel {
 
         clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
         therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
-        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTOol\\src\\rsc\\assignmentlIST.csv", clientData, therapistData);
+        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\assignmentList.csv", clientData, therapistData);
 
         //clientData = DataLoader.loadClientData();
         //therapistData = DataLoader.loadTherapistData();
@@ -109,7 +111,7 @@ public class ClientPanel extends JPanel {
         lastResizeY = size[1];
 
         findBoundingBox();
-        DataLoader.printDataList(allData);
+        //DataLoader.printDataList(allData);
         updateMap();
 
     }
@@ -117,7 +119,7 @@ public class ClientPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX, size[1] + mapOffsetY, null);
+        g.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX + 12, size[1] + mapOffsetY + 10, null);
 
         int assignmentColorIndex = 0;
 
@@ -132,7 +134,7 @@ public class ClientPanel extends JPanel {
 
                 Therapist t = (Therapist) curr;
 
-                if(t.getDisplayClients()) {
+                if(t.getDisplayClients() && t.getClientList().size() > 0) {
 
                     List<Client> therapistClients = t.getClientList();
 
@@ -145,6 +147,7 @@ public class ClientPanel extends JPanel {
                         g2.drawLine(curr.getTranslationX() + pointSize / 2, curr.getTranslationY() + pointSize / 2, client.getTranslationX() + pointSize / 2, client.getTranslationY() + pointSize / 2);
 
                     g2.setStroke(thinStroke);
+
 
                     assignmentColorIndex = (assignmentColorIndex + 1) % edgeColors.length;
 
@@ -221,10 +224,15 @@ public class ClientPanel extends JPanel {
 
     private void updateMap() {
 
+        float maxLat = boundingBox[0] - latitudeOffset;
+        float minLng = boundingBox[1] + longitudeOffset;
+        float minLat = boundingBox[2] + latitudeOffset;
+        float maxLng = boundingBox[3] - longitudeOffset;
+
         String centerString = center[0] + "," + center[1];
         String zoomString = Integer.toString(zoom);
         String sizeString = size[0] + "," + size[1];
-        String boundingString = boundingBox[0] + "," + boundingBox[1] + "," + boundingBox[2] + "," + boundingBox[3];
+        String boundingString = maxLat + "," + minLng + "," + minLat + "," + maxLng;
         String marginString = Integer.toString(margin);
 
         map = HttpCommands.getStaticMap(centerString, zoomString, sizeString, boundingString, marginString);

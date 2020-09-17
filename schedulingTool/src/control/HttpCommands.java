@@ -41,7 +41,11 @@ public class HttpCommands {
 
         if(address.contains(" #")) address = address.split(" #")[0];
 
-        String location = "&location=" + address.replace(" ", "%20") + "," + city.replace(" ", "%20") + "," + state + "," + zip;
+        String filteredAddress = address.replace(" ", "%20");
+        filteredAddress = filteredAddress.replace("\"", "");
+        String filteredCity = city.replace(" ", "%20");
+
+        String location = "&location=" + filteredAddress + "," + filteredCity + "," + state + "," + zip;
         String url = geocodeURL + "key=" + apiKey + location;
 
         System.out.println(url);
@@ -91,19 +95,17 @@ public class HttpCommands {
 
         String url = staticMapURL;
         url += "key=" + apiKey;
+        url += "&size=" + size;
         //url += "&center=" + center;
         //url += "&zoom=" + zoom;
-        url += "&size=" + size;
         url += "&boundingBox=" + boundingBox;
-        url += "&margin=" + margin;
+        //url += "&margin=" + margin;
 
         System.out.println(url);
 
         try {
 
-            BufferedImage staticMap = ImageIO.read(new URL(url));
-
-            return staticMap;
+            return ImageIO.read(new URL(url));
 
         } catch (IOException e) {
             System.err.println("Unable to process request: " + url);

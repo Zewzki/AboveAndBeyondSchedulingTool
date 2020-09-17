@@ -12,6 +12,8 @@ import java.util.regex.PatternSyntaxException;
 
 public class DataLoader {
 
+    private static final boolean TEST_MODE = false;
+
     private static final int therapistAssignmentOffset = 7;
 
     private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
@@ -42,7 +44,9 @@ public class DataLoader {
 
         ArrayList<Client> formatted = new ArrayList<>();
 
-        for(int i = 0; i < /*10*/ raw.size(); i++) {
+        int lim = TEST_MODE ? 10 : raw.size();
+
+        for(int i = 0; i < lim; i++) {
 
             CSVRecord c = raw.get(i);
 
@@ -89,7 +93,9 @@ public class DataLoader {
 
         ArrayList<Therapist> formatted = new ArrayList<>();
 
-        for(int i = 0; i < /*10*/ raw.size(); i++) {
+        int lim = TEST_MODE ? 10 : raw.size();
+
+        for(int i = 0; i < lim; i++) {
 
             CSVRecord c = raw.get(i);
 

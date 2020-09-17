@@ -14,6 +14,7 @@ public class ClientFrame extends JFrame {
 
     public ClientFrame() {
 
+        setTitle("A&B Client Visualization");
         setSize(STARTING_WIDTH, STARTING_HEIGHT);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(true);
