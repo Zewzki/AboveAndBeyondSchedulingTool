@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="schedulingTool:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/schedulingTool_jar</output-path>
+    <root id="archive" name="schedulingTool.jar">
+      <element id="module-output" name="schedulingTool" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../JavaLibs/commons-csv-1.5/commons-csv-1.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../JavaLibs/commons-csv-1.5/commons-csv-1.5-bin.zip" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../JavaLibs/commons-csv-1.5/commons-csv-1.5-sources.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

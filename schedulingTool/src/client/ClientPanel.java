@@ -1,6 +1,7 @@
 package client;
 
 import control.HttpCommands;
+import control.SessionLoader;
 import personalData.Client;
 import personalData.DataLoader;
 import personalData.PersonalData;
@@ -82,21 +83,10 @@ public class ClientPanel extends JPanel {
 
     public ClientPanel(int w, int h) {
 
-        //setSize(w, h);
+        therapistData = DataLoader.loadTherapistData();
+        clientData = DataLoader.loadClientData(therapistData);
 
-        //clientData = selectFileAndLoad("client");
-        //therapistData = selectFileAndLoad("therapist");
-        //assignmentData = selectFileAndLoad("assignment");
-
-        clientData = DataLoader.loadClientData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\clientList.csv");
-        therapistData = DataLoader.loadTherapistData("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\therapistList.csv");
-        DataLoader.loadAssignments("E:\\Code\\GitRepo\\AboveAndBeyondSchedulingTool\\schedulingTool\\src\\rsc\\assignmentList.csv", clientData, therapistData);
-
-        //clientData = DataLoader.loadClientData();
-        //therapistData = DataLoader.loadTherapistData();
-        //DataLoader.loadAssignments(clientData, therapistData);
-
-        allData = new ArrayList<PersonalData>();
+        allData = new ArrayList<>();
         allData.addAll(clientData);
         allData.addAll(therapistData);
 
@@ -116,10 +106,31 @@ public class ClientPanel extends JPanel {
 
     }
 
+    public ClientPanel() {
+
+        SessionLoader.readSession();
+        size = SessionLoader.size;
+        lastResizeX = size[0];
+        lastResizeY = size[1];
+        allData = SessionLoader.data;
+
+        center = new float[] {39, -100};
+        zoom = 14;
+
+        minDistance = Float.MAX_VALUE;
+
+        findBoundingBox();
+        updateMap();
+
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX + 12, size[1] + mapOffsetY + 10, null);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX + 12, size[1] + mapOffsetY + 10, null);
 
         int assignmentColorIndex = 0;
 
@@ -128,7 +139,7 @@ public class ClientPanel extends JPanel {
             PersonalData curr = allData.get(i);
 
             Color c = curr.getType() == PersonalData.PersonType.Client ? clientColor : therapistColor;
-            g.setColor(c);
+            g2.setColor(c);
 
             if(curr.getType() == PersonalData.PersonType.Therapist) {
 
@@ -138,9 +149,8 @@ public class ClientPanel extends JPanel {
 
                     List<Client> therapistClients = t.getClientList();
 
-                    g.setColor(edgeColors[assignmentColorIndex]);
+                    g2.setColor(edgeColors[assignmentColorIndex]);
 
-                    Graphics2D g2 = (Graphics2D) g;
                     g2.setStroke(thickStroke);
 
                     for(Client client : therapistClients)
@@ -295,7 +305,7 @@ public class ClientPanel extends JPanel {
 
     }
 
-    public void setSize(int x, int y) {
+    public void setImSize(int x, int y) {
         size[0] = x + displayOffsetX;
         size[1] = y + displayOffsetY;
 
@@ -313,5 +323,9 @@ public class ClientPanel extends JPanel {
         }
 
     }
+
+    public int[] getImSize() { return size; }
+
+    public List<PersonalData> getAllData() { return allData; }
 
 }

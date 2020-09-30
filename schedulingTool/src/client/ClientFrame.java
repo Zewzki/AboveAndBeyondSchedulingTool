@@ -1,6 +1,9 @@
 package client;
 
+import control.SessionLoader;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class ClientFrame extends JFrame {
@@ -8,9 +11,27 @@ public class ClientFrame extends JFrame {
     public static final int STARTING_WIDTH = 900;
     public static final int STARTING_HEIGHT = 900;
 
-    //private static final int STARTING_DIM = 800;
+    private static final Font infoFont = new Font("Didot", Font.PLAIN, 32);
 
-    private ClientPanel panel;
+    private static final String infoString = "<html>1. Export (as csv) a client list from ESRP containing first and last, address, and assigned therapist. No more no less.<br>" +
+                                             "2. Export (as csv) an employee list from ESRP containing first and last and address. No more no less.<br>" +
+                                             "3. Run this program and select 'Generate New'. It will guide you through correctly selecting these files.<br>" +
+                                             "4. A map with points representing people will now display. Clicking will show assignments.<br>" +
+                                             "5. Adjust the window size until dots appear to be in correct position, they should be pretty close but may need to adjust.<br>" +
+                                             "6. You can save the session for quick loading in the future. Save the size so you don't need adjust in the future.</html>";
+
+    private ClientPanel clientPanel;
+
+    private JButton loadExistingButton;
+    private JButton generateNewButton;
+    private JButton helpButton;
+    private JButton backButton;
+
+    private JMenu menu;
+    private JMenuBar menuBar;
+    private JMenuItem menuItem;
+
+    private JLabel infoLabel;
 
     public ClientFrame() {
 
@@ -20,16 +41,187 @@ public class ClientFrame extends JFrame {
         setResizable(true);
         setLocationRelativeTo(null);
 
-        addMouseListener(new MouseHandler());
-        addKeyListener(new KeyHandler());
-        addMouseMotionListener(new MouseMotionHandler());
-        addComponentListener(new ResizeHandler());
+        //addMouseListener(new MouseHandler());
+        //addKeyListener(new KeyHandler());
+        //addMouseMotionListener(new MouseMotionHandler());
+        //addComponentListener(new ResizeHandler());
 
-        panel = new ClientPanel(STARTING_WIDTH, STARTING_HEIGHT);
-        add(panel);
+        loadExistingButton = new JButton("Load Existing");
+        generateNewButton = new JButton("Generate New");
+        helpButton = new JButton("How To Use");
+        backButton = new JButton("Back");
+        infoLabel = new JLabel(infoString);
+
+        loadExistingButton.setVisible(true);
+        generateNewButton.setVisible(true);
+        helpButton.setVisible(true);
+
+        backButton.setVisible(false);
+        infoLabel.setVisible(false);
+        infoLabel.setFont(infoFont);
+
+        ButtonListener listener = new ButtonListener();
+
+        loadExistingButton.addActionListener(listener);
+        generateNewButton.addActionListener(listener);
+        helpButton.addActionListener(listener);
+        backButton.addActionListener(listener);
+
+        menuBar = new JMenuBar();
+
+        menu = new JMenu("File");
+        menu.setMnemonic(KeyEvent.VK_CONTROL);
+
+        menuItem = new JMenuItem("Save");
+        menuItem.setMnemonic(KeyEvent.VK_S);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if(clientPanel == null) return;
+
+                String dir = JOptionPane.showInputDialog("Enter save name (no spaces or special characters)") + ".csv";
+
+                int[] imSize = clientPanel.getImSize();
+
+                SessionLoader.writeSession(imSize[0], imSize[1], clientPanel.getAllData(), dir);
+
+            }
+        });
+
+        menu.add(menuItem);
+        menuBar.add(menu);
+
+        setJMenuBar(menuBar);
+
+        setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+
+        gc.weightx = .5;
+        gc.weighty = .5;
+        gc.ipadx = 5;
+        gc.ipady = 5;
+
+        gc.gridx = 0;
+        gc.gridy = 0;
+        add(loadExistingButton, gc);
+
+        gc.gridx = 1;
+        add(generateNewButton, gc);
+
+        gc.gridx = 2;
+        add(helpButton, gc);
+
+        gc.ipadx = 1;
+        gc.ipady = 1;
+
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.gridwidth = 3;
+        gc.gridheight = 1;
+        gc.fill = GridBagConstraints.BOTH;
+        add(infoLabel, gc);
+
+        gc.gridx = 0;
+        gc.gridy = 1;
+        gc.gridwidth = 1;
+        gc.gridheight = 1;
+        gc.fill = GridBagConstraints.NONE;
+        add(backButton, gc);
 
         setVisible(true);
 
+    }
+
+    private class ButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            if(e.getSource() == loadExistingButton) {
+
+                clientPanel = new ClientPanel();
+
+                generateNewButton.setVisible(false);
+                loadExistingButton.setVisible(false);
+                helpButton.setVisible(false);
+                backButton.setVisible(false);
+                infoLabel.setVisible(false);
+
+                GridBagConstraints gc = new GridBagConstraints();
+
+                gc.gridx = 0;
+                gc.gridy = 0;
+                gc.ipadx = 0;
+                gc.ipady = 0;
+                gc.weightx = 1.0;
+                gc.weighty = 1.0;
+                gc.gridwidth = 3;
+                gc.gridheight = 3;
+                add(clientPanel, gc);
+
+                setSize(clientPanel.getImSize()[0], clientPanel.getImSize()[1]);
+
+                addMouseListener(new MouseHandler());
+                addKeyListener(new KeyHandler());
+                addMouseMotionListener(new MouseMotionHandler());
+                addComponentListener(new ResizeHandler());
+
+                repaint();
+
+            }
+            else if(e.getSource() == generateNewButton) {
+                clientPanel = new ClientPanel(STARTING_WIDTH, STARTING_HEIGHT);
+
+                generateNewButton.setVisible(false);
+                loadExistingButton.setVisible(false);
+                helpButton.setVisible(false);
+                backButton.setVisible(false);
+                infoLabel.setVisible(false);
+
+                GridBagConstraints gc = new GridBagConstraints();
+
+                gc.gridx = 0;
+                gc.gridy = 0;
+                gc.ipadx = 0;
+                gc.ipady = 0;
+                gc.weightx = 1.0;
+                gc.weighty = 1.0;
+                gc.gridwidth = 3;
+                gc.gridheight = 3;
+                add(clientPanel, gc);
+
+                addMouseListener(new MouseHandler());
+                addKeyListener(new KeyHandler());
+                addMouseMotionListener(new MouseMotionHandler());
+                addComponentListener(new ResizeHandler());
+
+                repaint();
+
+            }
+            else if (e.getSource() == helpButton) {
+
+                generateNewButton.setVisible(false);
+                loadExistingButton.setVisible(false);
+                helpButton.setVisible(false);
+                backButton.setVisible(true);
+                infoLabel.setVisible(true);
+
+                repaint();
+
+            }
+            else if (e.getSource() == backButton) {
+
+                generateNewButton.setVisible(true);
+                loadExistingButton.setVisible(true);
+                helpButton.setVisible(true);
+                backButton.setVisible(false);
+                infoLabel.setVisible(false);
+
+                repaint();
+
+            }
+
+        }
     }
 
     private class MouseHandler implements MouseListener {
@@ -40,7 +232,7 @@ public class ClientFrame extends JFrame {
         @Override
         public void mousePressed(MouseEvent e) {
 
-            panel.processClick();
+            clientPanel.processClick();
 
         }
 
@@ -79,7 +271,7 @@ public class ClientFrame extends JFrame {
 
             int x = e.getX() - 10;
             int y = e.getY() - 40;
-            panel.setMousePosition(x, y);
+            clientPanel.setMousePosition(x, y);
 
         }
 
@@ -90,8 +282,8 @@ public class ClientFrame extends JFrame {
         @Override
         public void componentResized(ComponentEvent e) {
 
-            panel.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
-            panel.repaint();
+            clientPanel.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+            clientPanel.repaint();
 
         }
 
