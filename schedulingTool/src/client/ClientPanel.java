@@ -95,6 +95,8 @@ public class ClientPanel extends JPanel {
         center = new float[] {39, -100};
         zoom = 14;
         size = new int[] {w, h};
+        setSize(size[0], size[1]);
+        setPreferredSize(new Dimension(size[0], size[1]));
         minDistance = Float.MAX_VALUE;
 
         lastResizeX = size[0];
@@ -110,6 +112,8 @@ public class ClientPanel extends JPanel {
 
         SessionLoader.readSession();
         size = SessionLoader.size;
+        setSize(size[0], size[1]);
+        setPreferredSize(new Dimension(size[0], size[1]));
         lastResizeX = size[0];
         lastResizeY = size[1];
         allData = SessionLoader.data;
@@ -130,7 +134,7 @@ public class ClientPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2.drawImage(map, mapOffsetX, mapOffsetY, size[0] + mapOffsetX + 12, size[1] + mapOffsetY + 10, null);
+        g2.drawImage(map, mapOffsetX, mapOffsetY, getWidth() + mapOffsetX + 12, getHeight() + mapOffsetY + 10, null);
 
         int assignmentColorIndex = 0;
 
@@ -241,7 +245,7 @@ public class ClientPanel extends JPanel {
 
         String centerString = center[0] + "," + center[1];
         String zoomString = Integer.toString(zoom);
-        String sizeString = size[0] + "," + size[1];
+        String sizeString = getWidth() + "," + getHeight();
         String boundingString = maxLat + "," + minLng + "," + minLat + "," + maxLng;
         String marginString = Integer.toString(margin);
 
@@ -266,9 +270,9 @@ public class ClientPanel extends JPanel {
                 closestPointIndex = i;
                 minDistance = distanceFromMouse;
 
-                if(x > size[0] / 2 && y <= size[1] / 2) quadrant = Quadrant.ONE;
-                else if(x <= size[0] / 2 && y <= size[1] / 2) quadrant = Quadrant.TWO;
-                else if(x <= size[0] / 2 && y > size[1] / 2) quadrant = Quadrant.THREE;
+                if(x > getWidth() / 2 && y <= getHeight() / 2) quadrant = Quadrant.ONE;
+                else if(x <= getWidth() / 2 && y <= getHeight() / 2) quadrant = Quadrant.TWO;
+                else if(x <= getWidth() / 2 && y > getHeight() / 2) quadrant = Quadrant.THREE;
                 else quadrant = Quadrant.FOUR;
 
             }
@@ -305,26 +309,23 @@ public class ClientPanel extends JPanel {
 
     }
 
-    public void setImSize(int x, int y) {
-        size[0] = x + displayOffsetX;
-        size[1] = y + displayOffsetY;
+    public void setSize(int x, int y) {
+        super.setSize(x + displayOffsetX, y + displayOffsetY);
 
-        PersonalData.setScreenDimensions(size[0], size[1]);
+        PersonalData.setScreenDimensions(getWidth(), getHeight());
 
         for(PersonalData p : allData)
             p.calculateTranslation(boundingBox[2], boundingBox[0], boundingBox[1], boundingBox[3]);
 
-        float resizeDist = (float) Math.sqrt(Math.pow(size[0] - lastResizeX, 2) + Math.pow(size[1] - lastResizeY, 2));
+        float resizeDist = (float) Math.sqrt(Math.pow(getWidth() - lastResizeX, 2) + Math.pow(getHeight() - lastResizeY, 2));
 
         if(resizeDist > newMapResizeThreshold) {
             updateMap();
-            lastResizeX = size[0];
-            lastResizeY = size[1];
+            lastResizeX = getWidth();
+            lastResizeY = getHeight();
         }
 
     }
-
-    public int[] getImSize() { return size; }
 
     public List<PersonalData> getAllData() { return allData; }
 

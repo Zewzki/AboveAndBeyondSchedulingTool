@@ -15,7 +15,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class DataLoader {
 
-    private static final boolean TEST_MODE = false;
+    private static final boolean TEST_MODE = true;
 
     private static final int therapistAssignmentOffset = 7;
 
@@ -185,7 +185,7 @@ public class DataLoader {
 
             setVisible(true);
 
-            System.out.println("here");
+            pack();
 
         }
 

@@ -48,7 +48,7 @@ public class SessionLoader {
 
                     if(clientList.size() > 0) {
 
-                        for(int i = 0; i < clientList.size() - 1; i++) clientString += clientList.get(i).getFirstName() + " " + clientList.get(i).getLastName() + ";";
+                        for(int i = 0; i < clientList.size() - 1; i++) clientString += clientList.get(i).getFirstName() + "_" + clientList.get(i).getLastName() + ";";
                         clientString += clientList.get(clientList.size() - 1).getFirstName() + " " + clientList.get(clientList.size() - 1).getLastName();
 
                     }
@@ -151,7 +151,7 @@ public class SessionLoader {
 
                 for(String client : clientList) {
 
-                    String[] nameSplit = client.split(" ");
+                    String[] nameSplit = client.split("_");
 
                     for(PersonalData p : data) {
 

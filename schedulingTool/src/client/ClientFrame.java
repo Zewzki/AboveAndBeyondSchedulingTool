@@ -18,7 +18,7 @@ public class ClientFrame extends JFrame {
                                              "3. Run this program and select 'Generate New'. It will guide you through correctly selecting these files.<br>" +
                                              "4. A map with points representing people will now display. Clicking will show assignments.<br>" +
                                              "5. Adjust the window size until dots appear to be in correct position, they should be pretty close but may need to adjust.<br>" +
-                                             "6. You can save the session for quick loading in the future. Save the size so you don't need adjust in the future.</html>";
+                                             "6. You can save the session for quick loading in the future. This saves the size so you don't need adjust in the future.</html>";
 
     private ClientPanel clientPanel;
 
@@ -36,7 +36,7 @@ public class ClientFrame extends JFrame {
     public ClientFrame() {
 
         setTitle("A&B Client Visualization");
-        setSize(STARTING_WIDTH, STARTING_HEIGHT);
+        //setSize(STARTING_WIDTH, STARTING_HEIGHT);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(true);
         setLocationRelativeTo(null);
@@ -82,7 +82,7 @@ public class ClientFrame extends JFrame {
 
                 String dir = JOptionPane.showInputDialog("Enter save name (no spaces or special characters)") + ".csv";
 
-                int[] imSize = clientPanel.getImSize();
+                int[] imSize = new int[] {(int) clientPanel.getSize().getWidth(), (int) clientPanel.getSize().getHeight()};
 
                 SessionLoader.writeSession(imSize[0], imSize[1], clientPanel.getAllData(), dir);
 
@@ -129,6 +129,8 @@ public class ClientFrame extends JFrame {
         gc.fill = GridBagConstraints.NONE;
         add(backButton, gc);
 
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
 
     }
@@ -147,6 +149,7 @@ public class ClientFrame extends JFrame {
                 backButton.setVisible(false);
                 infoLabel.setVisible(false);
 
+                /*
                 GridBagConstraints gc = new GridBagConstraints();
 
                 gc.gridx = 0;
@@ -159,12 +162,20 @@ public class ClientFrame extends JFrame {
                 gc.gridheight = 3;
                 add(clientPanel, gc);
 
-                setSize(clientPanel.getImSize()[0], clientPanel.getImSize()[1]);
+                */
+
+                setLayout(new FlowLayout());
+                add(clientPanel);
+
+                //setSize(clientPanel.getImSize()[0], clientPanel.getImSize()[1]);
 
                 addMouseListener(new MouseHandler());
                 addKeyListener(new KeyHandler());
                 addMouseMotionListener(new MouseMotionHandler());
                 addComponentListener(new ResizeHandler());
+
+                pack();
+                setLocationRelativeTo(null);
 
                 repaint();
 
@@ -178,6 +189,8 @@ public class ClientFrame extends JFrame {
                 backButton.setVisible(false);
                 infoLabel.setVisible(false);
 
+                /*
+
                 GridBagConstraints gc = new GridBagConstraints();
 
                 gc.gridx = 0;
@@ -190,10 +203,18 @@ public class ClientFrame extends JFrame {
                 gc.gridheight = 3;
                 add(clientPanel, gc);
 
+                */
+
+                setLayout(new FlowLayout());
+                add(clientPanel);
+
                 addMouseListener(new MouseHandler());
                 addKeyListener(new KeyHandler());
                 addMouseMotionListener(new MouseMotionHandler());
                 addComponentListener(new ResizeHandler());
+
+                pack();
+                setLocationRelativeTo(null);
 
                 repaint();
 
@@ -206,6 +227,9 @@ public class ClientFrame extends JFrame {
                 backButton.setVisible(true);
                 infoLabel.setVisible(true);
 
+                pack();
+                setLocationRelativeTo(null);
+
                 repaint();
 
             }
@@ -216,6 +240,9 @@ public class ClientFrame extends JFrame {
                 helpButton.setVisible(true);
                 backButton.setVisible(false);
                 infoLabel.setVisible(false);
+
+                pack();
+                setLocationRelativeTo(null);
 
                 repaint();
 
@@ -270,7 +297,7 @@ public class ClientFrame extends JFrame {
         public void mouseMoved(MouseEvent e) {
 
             int x = e.getX() - 10;
-            int y = e.getY() - 40;
+            int y = e.getY() - 50;
             clientPanel.setMousePosition(x, y);
 
         }
@@ -283,7 +310,14 @@ public class ClientFrame extends JFrame {
         public void componentResized(ComponentEvent e) {
 
             clientPanel.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+            clientPanel.setSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+
             clientPanel.repaint();
+
+            //pack();
+            setLocationRelativeTo(null);
+
+            repaint();
 
         }
 
